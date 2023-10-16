@@ -1,27 +1,31 @@
-    - name: Check the current LUKS partitions
-      command: lsblk
-      register: result
+- name: Check the current LUKS partitions
+  command: lsblk
+  register: result
 
-    - name: Show LUKS partitions
-      debug:
-        var: result.stdout_lines
+- name: Extract device path
+  set_fact:
+    device_path: "{{ result.stdout | regex_search('/dev/nvme[0-9]n[0-9]p[0-9]', multiline=True) }}"
 
-        ##### GERMAN
+- name: Show LUKS partitions
+  debug:
+    var: result.stdout_lines
 
-    - name: Add new LUKS passphrase
-      expect:
-        command: cryptsetup luksAddKey /dev/nvme0n1p3
-        responses:
-          "Geben Sie irgendeine bestehende Passphrase ein:": "{{ wartungpw }}"
-          "Geben Sie die neue Passphrase für das Schlüsselfach ein:": "{{ password }}"
-          "Passphrase bestätigen:": "{{ password }}"
+- name: Add new LUKS passphrase
+  expect:
+    command: "cryptsetup luksAddKey {{ device_path }}"
+    responses:
+      "Geben Sie irgendeine bestehende Passphrase ein:": "{{ oldpw }}"
+      "Geben Sie die neue Passphrase für das Schlüsselfach ein:": "{{ password }}"
+      "Passphrase bestätigen:": "{{ password }}"
+
+
 
         ##### ENGLISCH
 
     - name: Add new LUKS passphrase
       expect:
-        command: cryptsetup luksAddKey /dev/nvme0n1p3
+        command: "cryptsetup luksAddKey {{ device_path }}"
         responses:
-          "Enter any existing passphrase:": "{{ wartungpw }}"
+          "Enter any existing passphrase:": "{{ odpw }}"
           "Enter new passphrase for key slot:": "{{ password }}"
           "Confirm passphrase:": "{{ password }}"
