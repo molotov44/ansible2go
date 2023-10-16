@@ -1,0 +1,27 @@
+    - name: Check the current LUKS partitions
+      command: lsblk
+      register: result
+
+    - name: Show LUKS partitions
+      debug:
+        var: result.stdout_lines
+
+        ##### GERMAN
+
+    - name: Add new LUKS passphrase
+      expect:
+        command: cryptsetup luksAddKey /dev/nvme0n1p3
+        responses:
+          "Geben Sie irgendeine bestehende Passphrase ein:": "{{ wartungpw }}"
+          "Geben Sie die neue Passphrase für das Schlüsselfach ein:": "{{ password }}"
+          "Passphrase bestätigen:": "{{ password }}"
+
+        ##### ENGLISCH
+
+    - name: Add new LUKS passphrase
+      expect:
+        command: cryptsetup luksAddKey /dev/nvme0n1p3
+        responses:
+          "Enter any existing passphrase:": "{{ wartungpw }}"
+          "Enter new passphrase for key slot:": "{{ password }}"
+          "Confirm passphrase:": "{{ password }}"
