@@ -1,0 +1,20 @@
+---
+- name: Create username and password and rustdesk variables globaly
+  hosts: user 
+  become: true
+  vars_prompt:
+    - name: username
+      prompt: Enter the username
+      private: no
+    - name: password
+      prompt: Enter the password
+      private: no
+
+
+  tasks:      
+    - name: Set username as fact
+      set_fact:
+        username: "{{ username }}"
+    - name: Set password as fact
+      set_fact:
+        password: "{{ password }}"
